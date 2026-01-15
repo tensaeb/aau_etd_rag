@@ -23,6 +23,7 @@ def main():
     pipeline_steps = [
         "src/pipeline/extract_text.py",
         "src/pipeline/chunk_text.py",
+        "src/pipeline/build_bm25.py",  # New step for keyword search
         "src/pipeline/embed_chunks.py",
         "src/pipeline/build_faiss.py"
     ]

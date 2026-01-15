@@ -6,6 +6,8 @@ from pathlib import Path
 import requests
 import time
 import yaml
+import pickle
+from rank_bm25 import BM25Okapi
 
 class RAGPipeline:
     def __init__(self, config_path="config.yaml"):
@@ -21,10 +23,11 @@ class RAGPipeline:
         print("RAG pipeline initialized successfully.")
 
     def _load_resources(self):
-        """Loads models, FAISS index, and metadata from disk."""
+        """Loads models, FAISS index, BM25 index, and metadata from disk."""
         # Paths
         self.chunk_dir = Path(self.config["data"]["chunk_dir"])
-        index_path = self.config["faiss"]["index_path"]
+        faiss_index_path = self.config["faiss"]["index_path"]
+        bm25_index_path = Path(faiss_index_path).parent / "bm25_index.pkl"
         metadata_path = Path(self.config["data"]["embedding_dir"]) / self.config["faiss"]["metadata_file"]
 
         # Models
@@ -33,16 +36,20 @@ class RAGPipeline:
         print("  - Loading cross-encoder model...")
         self.cross_encoder = CrossEncoder(self.config["models"]["cross_encoder"])
 
-        # Data and Index
+        # Data and Indexes
         print("  - Loading FAISS index and metadata...")
-        self.index = faiss.read_index(index_path)
+        self.index = faiss.read_index(faiss_index_path)
         self.metadata = np.load(metadata_path, allow_pickle=True)
+
+        print("  - Loading BM25 index...")
+        with open(bm25_index_path, "rb") as f:
+            bm25_data = pickle.load(f)
+            self.bm25 = bm25_data["bm25"]
+            self.bm25_doc_mapping = bm25_data["doc_mapping"]
 
     def _load_chunk(self, source, chunk_id):
         """Loads a specific text chunk from a file."""
-        # The `source` in metadata is the base stem (e.g., "doc1"), and the chunk files
-        # are saved as "doc1_chunks.txt".
-        file_path = self.chunk_dir / f"{source}_chunks.txt"
+        file_path = self.chunk_dir / f"{source}.txt"
 
         if not file_path.exists():
             return f"[Error: Chunk file not found: {file_path}]"
@@ -56,11 +63,45 @@ class RAGPipeline:
             return f"[Error loading chunk: {e}]"
 
     def _retrieve(self, query):
-        """Retrieves initial document candidates from FAISS."""
+        """
+        Retrieves initial document candidates using a hybrid approach:
+        - FAISS for semantic search.
+        - BM25 for keyword search.
+        - Results are combined with Reciprocal Rank Fusion (RRF).
+        """
         k = self.config["rag"]["retrieval_candidates"]
+
+        # 1. Semantic Search (FAISS)
         q_vec = self.embed_model.encode([f"query: {query}"])
-        _, I = self.index.search(q_vec, k)
-        return [self.metadata[i] for i in I[0]]
+        _, faiss_indices = self.index.search(q_vec, k)
+        faiss_results = [self.metadata[i] for i in faiss_indices[0]]
+
+        # 2. Keyword Search (BM25)
+        tokenized_query = query.split()
+        bm25_scores = self.bm25.get_scores(tokenized_query)
+        top_n_indices = np.argsort(bm25_scores)[::-1][:k]
+        bm25_results = [self.bm25_doc_mapping[i] for i in top_n_indices]
+
+        # 3. Reciprocal Rank Fusion (RRF)
+        return self._reciprocal_rank_fusion([faiss_results, bm25_results])
+
+    def _reciprocal_rank_fusion(self, result_lists, k=60):
+        """Combines multiple ranked lists using RRF."""
+        ranked_items = {}
+        for results in result_lists:
+            for rank, result in enumerate(results):
+                # Create a unique key for each document
+                doc_key = (result['source'], result['chunk_id'])
+                if doc_key not in ranked_items:
+                    ranked_items[doc_key] = 0
+                ranked_items[doc_key] += 1 / (k + rank + 1)
+
+        # Sort items by their RRF score in descending order
+        sorted_items = sorted(ranked_items.items(), key=lambda item: item[1], reverse=True)
+
+        # Convert back to the original metadata format
+        final_results = [{"source": key[0], "chunk_id": key[1]} for key, score in sorted_items]
+        return final_results
 
     def _rerank(self, query, items):
         """Reranks retrieved items using the cross-encoder."""

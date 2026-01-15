@@ -2,10 +2,12 @@ faiss-cpu
 numpy
 sentence-transformers
 requests
-PyMuPDF
 nltk
+langchain
+rank-bm25
 torch
 fastapi
 uvicorn
 pyyaml
-cross-encoder
+unstructured[local-inference]
+pikepdf

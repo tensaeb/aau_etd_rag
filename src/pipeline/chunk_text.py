@@ -1,15 +1,12 @@
-import nltk
+
 import yaml
 from pathlib import Path
+from langchain.text_splitter import RecursiveCharacterTextSplitter
 
-# Load configuration
+# --- CONFIGURATION ---
 with open("config.yaml", "r") as f:
     config = yaml.safe_load(f)
 
-# Download NLTK data
-nltk.download("punkt", quiet=True)
-
-# Configuration
 INPUT_DIR = Path(config["data"]["extracted_text_dir"])
 OUTPUT_DIR = Path(config["data"]["chunk_dir"])
 CHUNK_SIZE = config["chunking"]["chunk_size"]
@@ -17,33 +14,33 @@ OVERLAP = config["chunking"]["overlap"]
 
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
-def chunk_text(text, chunk_size, overlap):
-    """Chunks text into smaller pieces of a target size."""
-    sentences = nltk.sent_tokenize(text)
-    chunks = []
-    current = []
-    word_count = 0
+# --- INITIALIZE TEXT SPLITTER ---
+# This splitter is semantically aware. It tries to split on paragraphs ("\n\n"),
+# then sentences ("."), then newlines ("\n"), and finally words, to keep
+# related text together in the same chunk.
+text_splitter = RecursiveCharacterTextSplitter(
+    chunk_size=CHUNK_SIZE,
+    chunk_overlap=OVERLAP,
+    length_function=len,
+)
 
-    for sentence in sentences:
-        words = sentence.split()
-        current.append(sentence)
-        word_count += len(words)
+# --- MAIN EXECUTION ---
+print("Starting text chunking with RecursiveCharacterTextSplitter...")
+# Ensure there are files to process
+if not any(INPUT_DIR.glob("*.txt")):
+    print(f"No text files found in {INPUT_DIR}. Skipping chunking.")
+else:
+    for file in INPUT_DIR.glob("*.txt"):
+        print(f"  - Chunking: {file.name}")
+        text = file.read_text(encoding="utf-8")
 
-        if word_count >= CHUNK_SIZE:
-            chunks.append(" ".join(current))
-            current = current[-OVERLAP:]
-            word_count = sum(len(s.split()) for s in current)
+        # The splitter returns a list of strings.
+        chunks = text_splitter.split_text(text)
 
-    if current:
-        chunks.append(" ".join(current))
+        # Define output file path, e.g., "doc1.txt" -> "doc1_chunks.txt"
+        out_file = OUTPUT_DIR / f"{file.stem}_chunks.txt"
+        out_file.write_text("\n\n---\n\n".join(chunks), encoding="utf-8")
 
-    return chunks
+        print(f"    -> Created {len(chunks)} chunks.")
 
-for file in INPUT_DIR.glob("*.txt"):
-    text = file.read_text(encoding="utf-8")
-    chunks = chunk_text(text)
-
-    out_file = OUTPUT_DIR / f"{file.stem}_chunks.txt"
-    out_file.write_text("\n\n---\n\n".join(chunks), encoding="utf-8")
-
-    print(f"{file.name}: {len(chunks)} chunks")
+print("\nText chunking completed.")
