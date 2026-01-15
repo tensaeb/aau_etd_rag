@@ -1,17 +1,24 @@
 import nltk
+import yaml
 from pathlib import Path
 
-nltk.download("punkt", quiet=True)
-nltk.download("punkt_tab", quiet=True)
+# Load configuration
+with open("config.yaml", "r") as f:
+    config = yaml.safe_load(f)
 
-INPUT_DIR = Path("data/extracted_text")
-OUTPUT_DIR = Path("data/chunks")
+# Download NLTK data
+nltk.download("punkt", quiet=True)
+
+# Configuration
+INPUT_DIR = Path(config["data"]["extracted_text_dir"])
+OUTPUT_DIR = Path(config["data"]["chunk_dir"])
+CHUNK_SIZE = config["chunking"]["chunk_size"]
+OVERLAP = config["chunking"]["overlap"]
+
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
-CHUNK_SIZE = 400
-OVERLAP = 50
-
-def chunk_text(text):
+def chunk_text(text, chunk_size, overlap):
+    """Chunks text into smaller pieces of a target size."""
     sentences = nltk.sent_tokenize(text)
     chunks = []
     current = []
