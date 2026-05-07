@@ -1,137 +1,102 @@
-# Production-Ready Advanced RAG Pipeline
+# AAU ETD Advanced RAG Pipeline 🚀
 
-This project provides a robust, production-ready Retrieval-Augmented Generation (RAG) system designed for high accuracy and scalability. It transforms raw PDF documents into a searchable knowledge base and uses a sophisticated pipeline to answer questions based on the document content.
+A highly modular, production-ready Retrieval-Augmented Generation (RAG) system designed for extracting knowledge from academic documents (AAU ETD) with high precision and reliability.
 
-This is not a "naive" RAG implementation. It incorporates several advanced techniques to overcome the common limitations of simpler systems, making it suitable for complex documents that include tables, multi-column layouts, and specialized jargon.
-
-## Key Architectural Features
-
-The pipeline is built on a modular, configurable, and production-grade architecture.
-
-![RAG Architecture Diagram](https://i.imgur.com/8y52a2z.png)
-
-### 1. Smarter Ingestion (Layout-Aware Parsing)
-- **Technology**: `unstructured.io`
-- **Process**: Instead of naive text extraction, the system uses a layout-aware parsing model to interpret the structure of the PDFs.
-- **Benefit**: This correctly extracts text from complex elements like **tables**, headers, footers, and multi-column layouts. It prevents the context from being polluted with irrelevant data and ensures that structured information is preserved.
-
-### 2. Recursive & Semantic Chunking
-- **Technology**: `langchain.RecursiveCharacterTextSplitter`
-- **Process**: After extraction, the text is split into chunks. This is not a simple fixed-size split. The splitter intelligently divides the text along semantic boundaries, trying to keep paragraphs and sentences intact.
-- **Benefit**: This creates more coherent and contextually meaningful chunks, which dramatically improves the quality of the information retrieved.
-
-### 3. Hybrid Search (The Best of Both Worlds)
-- **Technology**: FAISS (Vector Search) + BM25 (Keyword Search)
-- **Process**: The retrieval process is a two-pronged "hybrid" search:
-    - **Semantic Search (FAISS)**: Understands the *meaning* and *concepts* behind the query.
-    - **Keyword Search (BM25)**: Excels at finding specific, literal terms, acronyms, or jargon.
-- **Benefit**: Combining these two methods ensures that the system retrieves documents that are both conceptually relevant and factually precise, overcoming the weaknesses of each individual approach. The results are merged using **Reciprocal Rank Fusion (RRF)** to produce a single, high-quality candidate list.
-
-### 4. Cross-Encoder Reranking (The Accuracy Booster)
-- **Technology**: `sentence-transformers.CrossEncoder`
-- **Process**: This is the final and most powerful step. The system first retrieves a large number of initial candidates (e.g., 20) from the hybrid search. Then, a specialized Cross-Encoder model carefully reads the query and each candidate document, re-scoring them for relevance.
-- **Benefit**: This filters out the "somewhat related" noise that simpler systems often retrieve, ensuring that only the most accurate and relevant documents are used to build the context for the final answer.
+This system moves beyond "naive RAG" by implementing a layered architecture with advanced retrieval strategies, semantic reranking, and a robust component-based design.
 
 ---
 
-## Getting Started
+## 🏛️ Advanced Architecture
 
-Follow these steps to set up the environment, process your documents, and run the RAG API.
+The system follows a **SOLID-compliant, modular architecture** that decouples the retrieval logic from specific model implementations.
 
-### Step 1: Clone the Repository and Install Dependencies
+### 1. Hybrid Retrieval Engine (FAISS + BM25)
+Retrieval is the most critical part of any RAG system. We use a **two-stream hybrid approach**:
+*   **Semantic Search (FAISS)**: Uses `intfloat/e5-base-v2` embeddings to find conceptually related chunks. It understands synonyms and intent.
+*   **Keyword Search (BM25)**: Uses the Okapi BM25 algorithm to find exact matches for technical terms, IDs, or specific Ethiopian academic jargon.
+*   **Reciprocal Rank Fusion (RRF)**: Merges results from both streams into a single ranked list, ensuring we don't miss anything that only one method would find.
 
-First, clone the repository and install the required Python packages. It is highly recommended to use a virtual environment.
+### 2. Cross-Encoder Reranking
+Initial retrieval might return 20-50 candidates. We then pass these through a **Cross-Encoder model** (`cross-encoder/ms-marco-MiniLM-L-6-v2`).
+*   Unlike bi-encoders, the cross-encoder processes the query and the document chunk *simultaneously*, allowing it to understand deep contextual relevance.
+*   It re-scores the candidates, and only the **top-K** most relevant chunks are sent to the LLM.
 
-```bash
-git clone <repository_url>
-cd <repository_name>
+### 3. Context Builder & Semantic Truncation
+*   **Layout-Aware Extraction**: Uses `unstructured` to parse PDFs, handling multi-column text and tables correctly.
+*   **Recursive Chunking**: Splits text into 1,500-character chunks with overlap to maintain context.
+*   **Smart Truncation**: When building the prompt, we use **NLTK sentence tokenization** to truncate text at sentence boundaries, preventing the LLM from seeing cut-off words that might lead to hallucinations.
 
-# Create and activate a virtual environment (optional but recommended)
+### 4. Modular Model Layer
+Everything is swappable. By implementing abstract interfaces, you can switch from LM Studio to OpenAI or Anthropic by changing just one file, without touching the core RAG logic.
+
+---
+
+## 🛠️ Getting Started
+
+### 1. Installation
+We recommend using the included virtual environment setup:
+
+```powershell
+# Create environment
 python -m venv venv
-source venv/bin/activate  # On Windows, use `venv\Scripts\activate`
+# Activate (Windows)
+.\venv\Scripts\activate
 
 # Install dependencies
 pip install -r requirements.txt
 ```
 
-### Step 2: Add Your PDF Documents
+### 2. Configuration
+All parameters (model names, chunk sizes, API ports, file paths) are centralized in `config.yaml`.
+**Crucial**: If your LLM is running on a different port or machine, update the `lm_studio` section.
 
-Place all the PDF files you want to include in the knowledge base into the `data/raw_pdfs/` directory.
+### 3. The Data Pipeline
+Place your PDFs in `data/raw_pdfs/` and run the end-to-end pipeline:
 
-```
-data/
-└── raw_pdfs/
-    ├── my_document_1.pdf
-    └── another_document.pdf
-```
-
-### Step 3: Run the Data Processing Pipeline
-
-Execute the main orchestration script to process your documents. This script will perform all the necessary steps: text extraction, chunking, and building both the BM25 and FAISS indexes.
-
-This step can take a while, depending on the number and size of your documents.
-
-```bash
+```powershell
 python -m src.run_pipeline
 ```
+This script handles:
+1.  `extract_text`: Layout-aware PDF parsing.
+2.  `chunk_text`: Semantic splitting.
+3.  `build_bm25`: Keyword index generation.
+4.  `embed_chunks`: Vector generation.
+5.  `build_faiss`: Vector index construction.
 
-You will see detailed logs for each step of the process. Upon completion, your indexes will be saved in the `indexes/` directory.
+### 4. Running the API
+Start the high-performance FastAPI server:
 
-### Step 4: Start the RAG API Server
-
-Once the data pipeline has finished, you can start the FastAPI server to expose the RAG system as an API.
-
-```bash
+```powershell
 python -m src.api
-```
-
-The server will start, and the API will be available at `http://localhost:8000`.
-
-### Step 5: Ask a Question
-
-You can now send questions to the API to get answers from your documents. Here is an example using `curl`:
-
-```bash
-curl -X POST "http://localhost:8000/ask" \
-     -H "Content-Type: application/json" \
-     -d '{
-           "question": "What is Software-Defined Networking and how does it work?"
-         }'
-```
-
-**Response:**
-
-You will receive a JSON response containing the answer generated by the pipeline.
-
-```json
-{
-  "answer": "Software-Defined Networking (SDN) is a network architecture approach that separates the control plane from the data plane. It allows network administrators to manage network services through abstraction of lower-level functionality. The control plane, which decides where traffic is sent, is centralized in a software-based controller, while the data plane, which forwards the traffic, remains in the hardware switches."
-}
 ```
 
 ---
 
-## Project Structure
+## 📂 Project Structure
 
-```
+```text
 .
-├── config.yaml               # Central configuration for all parameters
+├── config.yaml               # ⚙️ Centralized system configuration
+├── logs/                     # 📝 Structured execution logs
 ├── data/
-│   ├── raw_pdfs/             # Place your source PDFs here
-│   ├── extracted_text/       # Intermediate storage for parsed text
-│   └── chunks/               # Intermediate storage for text chunks
-├── indexes/                  # Storage for the FAISS and BM25 indexes
-├── requirements.txt          # Project dependencies
-└── src/                      # Main application source code
-    ├── __init__.py
-    ├── api.py                # FastAPI server to expose the RAG API
-    ├── rag_pipeline.py       # The core RAGPipeline class
-    ├── run_pipeline.py       # Orchestration script for the data pipeline
-    ├── run_rag.py            # CLI entry point to ask a question
-    └── pipeline/
-        ├── __init__.py
-        ├── build_bm25.py     # Script to build the keyword index
-        ├── build_faiss.py    # Script to build the vector index
-        ├── chunk_text.py     # Script for recursive text chunking
-        └── extract_text.py   # Script for layout-aware text extraction
+│   ├── raw_pdfs/             # 📂 Source PDF storage
+│   ├── extracted_text/       # 📄 Clean text files
+│   ├── chunks/               # 🧩 Processed text chunks
+│   └── embeddings/           # 🔢 Vector & metadata storage
+├── indexes/                  # 🔍 FAISS & BM25 index files
+└── src/
+    ├── core/                 # 🛠️ Configuration & Logger utilities
+    ├── models/               # 🧠 Abstract interfaces (Embedder, LLM, Reranker)
+    ├── retrieval/            # 🔍 Vector Store & Hybrid Search logic
+    ├── rag/                  # 🤖 Orchestration & Context Building
+    ├── pipeline/             # ⚙️ Individual ETL scripts
+    └── api.py                # 🌐 FastAPI implementation
 ```
+
+---
+
+## ⚠️ Important Notes for LM Studio
+If you experience "Channel Errors" or crashes:
+1.  **Switch to CPU only**: Set "GPU Offload" to 0 in LM Studio.
+2.  **Smaller Models**: Use `Phi-3-mini` or `Qwen2-1.5B` for better stability on integrated graphics.
+3.  **Context Size**: We have pre-set the `max_context_chars` to `2000` to prevent crashes on limited hardware.
