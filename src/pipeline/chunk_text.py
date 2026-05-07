@@ -1,46 +1,48 @@
-
-import yaml
+import sys
 from pathlib import Path
-from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain_text_splitters import RecursiveCharacterTextSplitter
+from ..core.config_loader import ConfigLoader
+from ..core.logger import setup_logger
 
-# --- CONFIGURATION ---
-with open("config.yaml", "r") as f:
-    config = yaml.safe_load(f)
+logger = setup_logger("chunk_text")
 
-INPUT_DIR = Path(config["data"]["extracted_text_dir"])
-OUTPUT_DIR = Path(config["data"]["chunk_dir"])
-CHUNK_SIZE = config["chunking"]["chunk_size"]
-OVERLAP = config["chunking"]["overlap"]
+def main():
+    try:
+        config_loader = ConfigLoader()
+        input_dir = config_loader.get_path("data.extracted_text_dir")
+        output_dir = config_loader.get_path("data.chunk_dir")
+        output_dir.mkdir(parents=True, exist_ok=True)
 
-OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+        # Note: chunk_size and overlap are in CHARACTERS in this implementation
+        chunk_size = config_loader.get("chunking.chunk_size")
+        overlap = config_loader.get("chunking.overlap")
 
-# --- INITIALIZE TEXT SPLITTER ---
-# This splitter is semantically aware. It tries to split on paragraphs ("\n\n"),
-# then sentences ("."), then newlines ("\n"), and finally words, to keep
-# related text together in the same chunk.
-text_splitter = RecursiveCharacterTextSplitter(
-    chunk_size=CHUNK_SIZE,
-    chunk_overlap=OVERLAP,
-    length_function=len,
-)
+        logger.info(f"Initializing text splitter (size={chunk_size}, overlap={overlap})")
+        splitter = RecursiveCharacterTextSplitter(
+            chunk_size=chunk_size,
+            chunk_overlap=overlap,
+            length_function=len,
+        )
 
-# --- MAIN EXECUTION ---
-print("Starting text chunking with RecursiveCharacterTextSplitter...")
-# Ensure there are files to process
-if not any(INPUT_DIR.glob("*.txt")):
-    print(f"No text files found in {INPUT_DIR}. Skipping chunking.")
-else:
-    for file in INPUT_DIR.glob("*.txt"):
-        print(f"  - Chunking: {file.name}")
-        text = file.read_text(encoding="utf-8")
+        text_files = list(input_dir.glob("*.txt"))
+        if not text_files:
+            logger.warning(f"No text files found in {input_dir}")
+            return
 
-        # The splitter returns a list of strings.
-        chunks = text_splitter.split_text(text)
+        for file in text_files:
+            logger.info(f"Chunking: {file.name}")
+            text = file.read_text(encoding="utf-8")
+            chunks = splitter.split_text(text)
+            
+            output_file = output_dir / f"{file.stem}.txt"
+            output_file.write_text("\n\n---\n\n".join(chunks), encoding="utf-8")
+            logger.info(f"  -> Created {len(chunks)} chunks.")
 
-        # Define output file path, e.g., "doc1.txt" -> "doc1_chunks.txt"
-        out_file = OUTPUT_DIR / f"{file.stem}_chunks.txt"
-        out_file.write_text("\n\n---\n\n".join(chunks), encoding="utf-8")
+        logger.info("Chunking completed.")
 
-        print(f"    -> Created {len(chunks)} chunks.")
+    except Exception as e:
+        logger.critical(f"Critical error in chunking pipeline: {e}")
+        sys.exit(1)
 
-print("\nText chunking completed.")
+if __name__ == "__main__":
+    main()

@@ -1,0 +1,9 @@
+2026-05-07 21:26:59 - llm_provider - ERROR - Request error (attempt 1/3): 400 Client Error: Bad Request for url: http://localhost:1234/v1/chat/completions
+2026-05-07 21:27:03 - llm_provider - ERROR - Request error (attempt 2/3): 400 Client Error: Bad Request for url: http://localhost:1234/v1/chat/completions
+2026-05-07 21:27:09 - llm_provider - ERROR - Request error (attempt 3/3): 400 Client Error: Bad Request for url: http://localhost:1234/v1/chat/completions
+2026-05-07 21:34:28 - llm_provider - ERROR - LM Studio API error (400): {"error":"The model has crashed without additional information. (Exit code: 18446744072635812000)"}
+2026-05-07 21:34:28 - llm_provider - ERROR - Request error (attempt 1/3): 400 Client Error: Bad Request for url: http://192.168.1.8:1234/v1/chat/completions
+2026-05-07 21:35:08 - llm_provider - ERROR - LM Studio API error (400): {"error":"The model has crashed without additional information. (Exit code: 18446744072635812000)"}
+2026-05-07 21:35:08 - llm_provider - ERROR - Request error (attempt 2/3): 400 Client Error: Bad Request for url: http://192.168.1.8:1234/v1/chat/completions
+2026-05-07 21:35:46 - llm_provider - ERROR - LM Studio API error (400): {"error":"Model reloaded."}
+2026-05-07 21:35:46 - llm_provider - ERROR - Request error (attempt 3/3): 400 Client Error: Bad Request for url: http://192.168.1.8:1234/v1/chat/completions

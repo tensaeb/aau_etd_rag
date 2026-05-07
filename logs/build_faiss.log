@@ -1,0 +1,6 @@
+2026-05-07 21:03:16 - build_faiss - INFO - Loading embeddings from: C:\Users\befek\OneDrive\Documents\RAG\aau-etd\data\embeddings\embeddings.npy
+2026-05-07 21:03:16 - build_faiss - INFO - FAISS index built successfully.
+2026-05-07 21:06:42 - build_faiss - INFO - Loading embeddings from: C:\Users\befek\OneDrive\Documents\RAG\aau-etd\data\embeddings\embeddings.npy
+2026-05-07 21:06:42 - build_faiss - INFO - FAISS index built successfully.
+2026-05-07 21:25:22 - build_faiss - INFO - Loading embeddings from: C:\Users\befek\OneDrive\Documents\RAG\aau-etd\data\embeddings\embeddings.npy
+2026-05-07 21:25:22 - build_faiss - INFO - FAISS index built successfully.

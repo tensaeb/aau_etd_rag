@@ -1,32 +1,38 @@
-import faiss
+import sys
 import numpy as np
-import yaml
 from pathlib import Path
+from ..core.config_loader import ConfigLoader
+from ..core.logger import setup_logger
+from ..retrieval.vector_store import FaissStore
 
-# Load configuration
-with open("config.yaml", "r") as f:
-    config = yaml.safe_load(f)
+logger = setup_logger("build_faiss")
 
-# Configuration from YAML
-EMB_DIR = Path(config["data"]["embedding_dir"])
-EMBEDDINGS_FILE = EMB_DIR / config["faiss"]["embeddings_file"]
-INDEX_PATH = Path(config["faiss"]["index_path"])
+def main():
+    try:
+        config_loader = ConfigLoader()
+        config = config_loader.all
+        
+        emb_dir = config_loader.get_path("data.embedding_dir")
+        embeddings_file = emb_dir / config["faiss"]["embeddings_file"]
+        metadata_file = emb_dir / config["faiss"]["metadata_file"]
+        index_path = config_loader.get_path("faiss.index_path")
 
-# Load embeddings
-print(f"Loading embeddings from: {EMBEDDINGS_FILE}")
-embeddings = np.load(EMBEDDINGS_FILE)
-dim = embeddings.shape[1]
-print(f"Embeddings loaded. Shape: {embeddings.shape}")
+        if not embeddings_file.exists():
+            logger.error(f"Embeddings file not found: {embeddings_file}")
+            return
 
-# Build the FAISS index
-print("Building FAISS index...")
-index = faiss.IndexFlatL2(dim)  # Using L2 distance for similarity
-index.add(embeddings)
+        logger.info(f"Loading embeddings from: {embeddings_file}")
+        embeddings = np.load(embeddings_file)
+        metadata = np.load(metadata_file, allow_pickle=True)
 
-# Save the index
-INDEX_PATH.parent.mkdir(parents=True, exist_ok=True)
-faiss.write_index(index, str(INDEX_PATH))
+        store = FaissStore(str(index_path), str(metadata_file))
+        store.build_and_save(embeddings, metadata)
 
-print(f"FAISS index built successfully.")
-print(f"  - Total vectors: {index.ntotal}")
-print(f"  - Index saved to: {INDEX_PATH}")
+        logger.info("FAISS index built successfully.")
+
+    except Exception as e:
+        logger.critical(f"Critical error in FAISS build: {e}")
+        sys.exit(1)
+
+if __name__ == "__main__":
+    main()

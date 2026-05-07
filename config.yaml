@@ -17,12 +17,13 @@ data:
 # --------------------------------------------------------------------------
 # These settings control how documents are split into smaller pieces.
 # Tuning these is crucial for retrieval performance.
+# NOTE: Sizes are measured in CHARACTERS.
 chunking:
-  # Target size for each chunk in words.
-  chunk_size: 400
-  # Overlap between consecutive chunks in words.
+  # Target size for each chunk in characters.
+  chunk_size: 1500
+  # Overlap between consecutive chunks in characters.
   # This helps maintain context across chunks.
-  overlap: 50
+  overlap: 200
 
 # --------------------------------------------------------------------------
 # 3. EMBEDDING & RETRIEVAL MODELS
@@ -62,7 +63,7 @@ rag:
   top_k: 3
   # Maximum characters to use for the context.
   # This prevents exceeding the LLM's context window.
-  max_context_chars: 6000
+  max_context_chars: 4000
 
 # --------------------------------------------------------------------------
 # 6. LM STUDIO API
@@ -70,9 +71,9 @@ rag:
 # Local LLM server configuration.
 lm_studio:
   # URL for the LM Studio chat completions endpoint.
-  url: "http://localhost:1234/v1/chat/completions"
+  url: "http://192.168.1.8:1234/v1/chat/completions"
   # The model identifier to use (e.g., "mistral", "llama3").
-  model: "mistral"
+  model: "mistralai/mistral-7b-instruct-v0.3"
   # The temperature setting for the LLM (0.0 for deterministic output).
   temperature: 0.0
 

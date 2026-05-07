@@ -1,37 +1,45 @@
-
-import yaml
-import pickle
+import sys
 from pathlib import Path
-from rank_bm25 import BM25Okapi
+from ..core.config_loader import ConfigLoader
+from ..core.logger import setup_logger
+from ..retrieval.bm25_retriever import BM25Retriever
 
-# --- CONFIGURATION ---
-with open("config.yaml", "r") as f:
-    config = yaml.safe_load(f)
+logger = setup_logger("build_bm25")
 
-CHUNK_DIR = Path(config["data"]["chunk_dir"])
-INDEX_PATH = Path(config["faiss"]["index_path"]).parent # Store in the same dir as FAISS
-BM25_INDEX_FILE = INDEX_PATH / "bm25_index.pkl"
+def main():
+    try:
+        config_loader = ConfigLoader()
+        chunk_dir = config_loader.get_path("data.chunk_dir")
+        index_path = config_loader.get_path("faiss.index_path").parent / "bm25_index.pkl"
 
-# --- MAIN EXECUTION ---
-print("Starting BM25 index build...")
-corpus = []
-doc_mapping = [] # To map corpus index back to source file and chunk_id
+        logger.info("Starting BM25 index build...")
+        corpus = []
+        doc_mapping = []
 
-# 1. Load all chunks into a corpus
-print("  - Loading and tokenizing chunks...")
-for file in CHUNK_DIR.glob("*_chunks.txt"):
-    chunks = file.read_text(encoding="utf-8").split("\n\n---\n\n")
-    for i, chunk in enumerate(chunks):
-        corpus.append(chunk.split()) # BM25 works on tokenized text
-        doc_mapping.append({"source": file.stem, "chunk_id": i})
+        chunk_files = list(chunk_dir.glob("*.txt"))
+        if not chunk_files:
+            logger.warning("No chunk files found.")
+            return
 
-# 2. Create the BM25 index from the corpus
-print(f"  - Building BM25 index for {len(corpus)} documents...")
-bm25 = BM25Okapi(corpus)
+        for file in chunk_files:
+            # Fix source key: remove "_chunks" to match retrieval expectations
+            source_name = file.stem
+            
+            content = file.read_text(encoding="utf-8")
+            chunks = content.split("\n\n---\n\n")
+            
+            for i, chunk in enumerate(chunks):
+                corpus.append(chunk.split()) # BM25 works on tokenized text
+                doc_mapping.append({"source": source_name, "chunk_id": i})
 
-# 3. Save the index and the document mapping
-print(f"  - Saving BM25 index to: {BM25_INDEX_FILE}")
-with open(BM25_INDEX_FILE, "wb") as f:
-    pickle.dump({"bm25": bm25, "doc_mapping": doc_mapping}, f)
+        retriever = BM25Retriever(str(index_path))
+        retriever.build_and_save(corpus, doc_mapping)
 
-print("\nBM25 index build completed successfully.")
+        logger.info("BM25 index build completed.")
+
+    except Exception as e:
+        logger.critical(f"Critical error in BM25 build: {e}")
+        sys.exit(1)
+
+if __name__ == "__main__":
+    main()

@@ -1,0 +1,24 @@
+2026-05-07 20:57:25 - chunk_text - INFO - Initializing text splitter (size=1500, overlap=200)
+2026-05-07 20:57:25 - chunk_text - INFO - Chunking: Banchiaymolu Adera  2023.txt
+2026-05-07 20:57:25 - chunk_text - INFO -   -> Created 200 chunks.
+2026-05-07 20:57:25 - chunk_text - INFO - Chunking: Ermias Tsegu  2023.txt
+2026-05-07 20:57:25 - chunk_text - INFO -   -> Created 167 chunks.
+2026-05-07 20:57:25 - chunk_text - INFO - Chunking: Zenebe Kassie  2023.txt
+2026-05-07 20:57:25 - chunk_text - INFO -   -> Created 179 chunks.
+2026-05-07 20:57:25 - chunk_text - INFO - Chunking completed.
+2026-05-07 21:01:16 - chunk_text - INFO - Initializing text splitter (size=1500, overlap=200)
+2026-05-07 21:01:16 - chunk_text - INFO - Chunking: Banchiaymolu Adera  2023.txt
+2026-05-07 21:01:16 - chunk_text - INFO -   -> Created 200 chunks.
+2026-05-07 21:01:16 - chunk_text - INFO - Chunking: Ermias Tsegu  2023.txt
+2026-05-07 21:01:16 - chunk_text - INFO -   -> Created 167 chunks.
+2026-05-07 21:01:16 - chunk_text - INFO - Chunking: Zenebe Kassie  2023.txt
+2026-05-07 21:01:16 - chunk_text - INFO -   -> Created 179 chunks.
+2026-05-07 21:01:16 - chunk_text - INFO - Chunking completed.
+2026-05-07 21:20:48 - chunk_text - INFO - Initializing text splitter (size=1500, overlap=200)
+2026-05-07 21:20:48 - chunk_text - INFO - Chunking: Banchiaymolu Adera  2023.txt
+2026-05-07 21:20:48 - chunk_text - INFO -   -> Created 200 chunks.
+2026-05-07 21:20:48 - chunk_text - INFO - Chunking: Ermias Tsegu  2023.txt
+2026-05-07 21:20:48 - chunk_text - INFO -   -> Created 167 chunks.
+2026-05-07 21:20:48 - chunk_text - INFO - Chunking: Zenebe Kassie  2023.txt
+2026-05-07 21:20:48 - chunk_text - INFO -   -> Created 179 chunks.
+2026-05-07 21:20:48 - chunk_text - INFO - Chunking completed.

@@ -1,43 +1,59 @@
-import yaml
+import sys
 from pathlib import Path
 from unstructured.partition.pdf import partition_pdf
+from ..core.config_loader import ConfigLoader
+from ..core.logger import setup_logger
 
-# Load configuration
-with open("config.yaml", "r") as f:
-    config = yaml.safe_load(f)
+logger = setup_logger("extract_text")
 
-INPUT_DIR = Path(config["data"]["raw_pdf_dir"])
-OUTPUT_DIR = Path(config["data"]["extracted_text_dir"])
-OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+def extract_text_from_pdf(pdf_path: Path) -> str:
+    """Extracts text from a single PDF file."""
+    logger.info(f"Processing: {pdf_path.name}")
+    try:
+        elements = partition_pdf(
+            filename=str(pdf_path),
+            strategy="hi_res",
+        )
+        return "\n\n".join([el.text for el in elements])
+    except Exception as e:
+        logger.error(f"Failed to partition {pdf_path.name}: {e}")
+        raise
 
-def extract_text_from_pdf(pdf_path):
-    """
-    Extracts structured text elements from a PDF using unstructured.
-    This preserves layout and table information better than raw text extraction.
-    """
-    print(f"Partitioning PDF: {pdf_path.name}")
-    elements = partition_pdf(
-        filename=str(pdf_path),
-        # Using "hi_res" strategy for better table and layout detection.
-        strategy="hi_res",
-        # You can add other parameters here, like `infer_table_structure=True`
-        # if you have tables with complex structures.
-    )
-    # Combine the text from all extracted elements.
-    return "\n\n".join([el.text for el in elements])
+def main():
+    try:
+        config_loader = ConfigLoader()
+        input_dir = config_loader.get_path("data.raw_pdf_dir")
+        output_dir = config_loader.get_path("data.extracted_text_dir")
+        output_dir.mkdir(parents=True, exist_ok=True)
 
-# --- Main Execution ---
-print("Starting PDF text extraction with 'unstructured'...")
-for pdf_file in INPUT_DIR.glob("*.pdf"):
-    # Extract the structured text.
-    extracted_content = extract_text_from_pdf(pdf_file)
+        pdf_files = list(input_dir.glob("*.pdf"))
+        if not pdf_files:
+            logger.warning(f"No PDF files found in {input_dir}")
+            return
 
-    # Define the output file path.
-    output_file = OUTPUT_DIR / f"{pdf_file.stem}.txt"
+        logger.info(f"Starting extraction for {len(pdf_files)} files...")
+        
+        for pdf_file in pdf_files:
+            output_file = output_dir / f"{pdf_file.stem}.txt"
+            
+            # Skip if already exists (optional, but good for resuming)
+            if output_file.exists():
+                logger.info(f"  - Skipping {pdf_file.name} (already extracted)")
+                continue
+                
+            try:
+                text = extract_text_from_pdf(pdf_file)
+                output_file.write_text(text, encoding="utf-8")
+                logger.info(f"  -> Success: {output_file.name}")
+            except Exception:
+                logger.error(f"  !! Failed to process {pdf_file.name}, skipping.")
+                continue
 
-    # Save the content to a text file.
-    output_file.write_text(extracted_content, encoding="utf-8")
+        logger.info("Extraction completed.")
 
-    print(f"  -> Saved extracted text to: {output_file}")
+    except Exception as e:
+        logger.critical(f"Critical error in extraction pipeline: {e}")
+        sys.exit(1)
 
-print("\nPDF text extraction completed.")
+if __name__ == "__main__":
+    main()

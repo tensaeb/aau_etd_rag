@@ -1,14 +1,21 @@
-import requests
+from ..core.config_loader import ConfigLoader
+from ..models.llm import LMStudioLLM
 
-url = "http://192.168.1.22:1234/v1/chat/completions"
+def main():
+    config_loader = ConfigLoader()
+    config = config_loader.all
+    
+    llm = LMStudioLLM(
+        url=config["lm_studio"]["url"],
+        model=config["lm_studio"]["model"],
+        temperature=config["lm_studio"]["temperature"]
+    )
+    
+    prompt = "Explain artificial intelligence in one sentence."
+    print(f"Testing LM Studio connection (URL: {llm.url})...")
+    
+    answer = llm.generate(prompt)
+    print(f"\nResponse: {answer}")
 
-payload = {
-    "model": "mistral",
-    "messages": [
-        {"role": "user", "content": "Explain artificial intelligence in one sentence."}
-    ],
-    "temperature": 0.0
-}
-
-response = requests.post(url, json=payload)
-print(response.json()["choices"][0]["message"]["content"])
+if __name__ == "__main__":
+    main()

@@ -1,48 +1,56 @@
-from sentence_transformers import SentenceTransformer
-from pathlib import Path
+import sys
 import numpy as np
-import yaml
+from pathlib import Path
+from ..core.config_loader import ConfigLoader
+from ..core.logger import setup_logger
+from ..models.embedder import SentenceTransformerEmbedder
 
-# Load configuration
-with open("config.yaml", "r") as f:
-    config = yaml.safe_load(f)
+logger = setup_logger("embed_chunks")
 
-# Configuration
-MODEL_NAME = config["models"]["embedding"]
-CHUNK_DIR = Path(config["data"]["chunk_dir"])
-EMB_DIR = Path(config["data"]["embedding_dir"])
-EMBEDDINGS_FILE = EMB_DIR / config["faiss"]["embeddings_file"]
-METADATA_FILE = EMB_DIR / config["faiss"]["metadata_file"]
+def main():
+    try:
+        config_loader = ConfigLoader()
+        config = config_loader.all
+        
+        chunk_dir = config_loader.get_path("data.chunk_dir")
+        emb_dir = config_loader.get_path("data.embedding_dir")
+        emb_dir.mkdir(parents=True, exist_ok=True)
+        
+        embeddings_file = emb_dir / config["faiss"]["embeddings_file"]
+        metadata_file = emb_dir / config["faiss"]["metadata_file"]
 
-# Initialize model
-model = SentenceTransformer(MODEL_NAME)
-EMB_DIR.mkdir(exist_ok=True)
+        embedder = SentenceTransformerEmbedder(config["models"]["embedding"])
 
-# Prepare lists
-all_chunks = []
-metadata = []
+        all_chunks = []
+        metadata = []
 
-# Process each chunk file
-for file in CHUNK_DIR.glob("*.txt"):
-    # The stem for chunk files is like "doc1_chunks.txt", so remove "_chunks"
-    source_stem = file.stem.replace("_chunks", "")
-    chunks = file.read_text(encoding="utf-8").split("\n\n---\n\n")
-    for i, chunk in enumerate(chunks):
-        # Add the required prefix for the e5 model
-        all_chunks.append(f"passage: {chunk}")
-        metadata.append({
-            "source": source_stem,
-            "chunk_id": i
-        })
+        # Fix glob: only process files with _chunks.txt suffix
+        chunk_files = list(chunk_dir.glob("*.txt"))
+        if not chunk_files:
+            logger.warning("No chunk files found.")
+            return
 
-# Generate embeddings
-print(f"Embedding {len(all_chunks)} chunks with model: {MODEL_NAME}...")
-embeddings = model.encode(all_chunks, show_progress_bar=True)
+        for file in chunk_files:
+            source_name = file.stem
+            chunks = file.read_text(encoding="utf-8").split("\n\n---\n\n")
+            
+            for i, chunk in enumerate(chunks):
+                # Add required prefix for e5 models
+                all_chunks.append(f"passage: {chunk}")
+                metadata.append({"source": source_name, "chunk_id": i})
 
-# Save embeddings and metadata
-np.save(EMBEDDINGS_FILE, embeddings)
-np.save(METADATA_FILE, metadata)
+        logger.info(f"Embedding {len(all_chunks)} chunks...")
+        embeddings = embedder.encode(all_chunks, normalize=True)
 
-print("Embeddings shape:", embeddings.shape)
-print(f"Saved embeddings to: {EMBEDDINGS_FILE}")
-print(f"Saved metadata to: {METADATA_FILE}")
+        logger.info(f"Saving embeddings (shape={embeddings.shape}) to {embeddings_file}")
+        np.save(embeddings_file, embeddings)
+        np.save(metadata_file, metadata)
+
+        logger.info("Embedding completed successfully.")
+
+    except Exception as e:
+        logger.critical(f"Critical error in embedding pipeline: {e}")
+        sys.exit(1)
+
+if __name__ == "__main__":
+    main()

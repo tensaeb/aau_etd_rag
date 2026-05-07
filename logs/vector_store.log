@@ -1,0 +1,14 @@
+2026-05-07 21:03:16 - vector_store - INFO - Building FAISS IndexFlatIP with dimension 768
+2026-05-07 21:03:16 - vector_store - INFO - Saved FAISS index to C:\Users\befek\OneDrive\Documents\RAG\aau-etd\indexes\aau_faiss.index and metadata to C:\Users\befek\OneDrive\Documents\RAG\aau-etd\data\embeddings\metadata.npy
+2026-05-07 21:06:42 - vector_store - INFO - Building FAISS IndexFlatIP with dimension 768
+2026-05-07 21:06:42 - vector_store - INFO - Saved FAISS index to C:\Users\befek\OneDrive\Documents\RAG\aau-etd\indexes\aau_faiss.index and metadata to C:\Users\befek\OneDrive\Documents\RAG\aau-etd\data\embeddings\metadata.npy
+2026-05-07 21:09:22 - vector_store - INFO - Loading FAISS index from C:\Users\befek\OneDrive\Documents\RAG\aau-etd\indexes\aau_faiss.index
+2026-05-07 21:09:22 - vector_store - INFO - Loading metadata from C:\Users\befek\OneDrive\Documents\RAG\aau-etd\data\embeddings\metadata.npy
+2026-05-07 21:25:22 - vector_store - INFO - Building FAISS IndexFlatIP with dimension 768
+2026-05-07 21:25:22 - vector_store - INFO - Saved FAISS index to C:\Users\befek\OneDrive\Documents\RAG\aau-etd\indexes\aau_faiss.index and metadata to C:\Users\befek\OneDrive\Documents\RAG\aau-etd\data\embeddings\metadata.npy
+2026-05-07 21:26:04 - vector_store - INFO - Loading FAISS index from C:\Users\befek\OneDrive\Documents\RAG\aau-etd\indexes\aau_faiss.index
+2026-05-07 21:26:04 - vector_store - INFO - Loading metadata from C:\Users\befek\OneDrive\Documents\RAG\aau-etd\data\embeddings\metadata.npy
+2026-05-07 21:33:28 - vector_store - INFO - Loading FAISS index from C:\Users\befek\OneDrive\Documents\RAG\aau-etd\indexes\aau_faiss.index
+2026-05-07 21:33:28 - vector_store - INFO - Loading metadata from C:\Users\befek\OneDrive\Documents\RAG\aau-etd\data\embeddings\metadata.npy
+2026-05-07 21:41:00 - vector_store - INFO - Loading FAISS index from C:\Users\befek\OneDrive\Documents\RAG\aau-etd\indexes\aau_faiss.index
+2026-05-07 21:41:00 - vector_store - INFO - Loading metadata from C:\Users\befek\OneDrive\Documents\RAG\aau-etd\data\embeddings\metadata.npy
