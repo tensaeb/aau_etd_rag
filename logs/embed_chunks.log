@@ -1,0 +1,9 @@
+2026-05-07 20:57:47 - embed_chunks - INFO - Embedding 546 chunks...
+2026-05-07 21:01:51 - embed_chunks - INFO - Embedding 546 chunks...
+2026-05-07 21:03:06 - embed_chunks - INFO - Saving embeddings (shape=(546, 768)) to C:\Users\befek\OneDrive\Documents\RAG\aau-etd\data\embeddings\embeddings.npy
+2026-05-07 21:03:06 - embed_chunks - INFO - Embedding completed successfully.
+2026-05-07 21:06:39 - embed_chunks - INFO - Saving embeddings (shape=(546, 768)) to C:\Users\befek\OneDrive\Documents\RAG\aau-etd\data\embeddings\embeddings.npy
+2026-05-07 21:06:39 - embed_chunks - INFO - Embedding completed successfully.
+2026-05-07 21:21:06 - embed_chunks - INFO - Embedding 546 chunks...
+2026-05-07 21:25:20 - embed_chunks - INFO - Saving embeddings (shape=(546, 768)) to C:\Users\befek\OneDrive\Documents\RAG\aau-etd\data\embeddings\embeddings.npy
+2026-05-07 21:25:20 - embed_chunks - INFO - Embedding completed successfully.

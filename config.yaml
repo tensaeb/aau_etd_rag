@@ -1,0 +1,86 @@
+
+# --------------------------------------------------------------------------
+# 1. DATA SOURCE & PREPARATION
+# --------------------------------------------------------------------------
+data:
+  # Raw PDFs location
+  raw_pdf_dir: "data/raw_pdfs"
+  # Extracted text location (after PDF parsing)
+  extracted_text_dir: "data/extracted_text"
+  # Chunked text location (after text splitting)
+  chunk_dir: "data/chunks"
+  # Final embeddings and metadata location
+  embedding_dir: "data/embeddings"
+
+# --------------------------------------------------------------------------
+# 2. TEXT CHUNKING PARAMETERS
+# --------------------------------------------------------------------------
+# These settings control how documents are split into smaller pieces.
+# Tuning these is crucial for retrieval performance.
+# NOTE: Sizes are measured in CHARACTERS.
+chunking:
+  # Target size for each chunk in characters.
+  chunk_size: 1500
+  # Overlap between consecutive chunks in characters.
+  # This helps maintain context across chunks.
+  overlap: 200
+
+# --------------------------------------------------------------------------
+# 3. EMBEDDING & RETRIEVAL MODELS
+# --------------------------------------------------------------------------
+# Models for converting text to vectors and for reranking results.
+models:
+  # Model for creating the initial text embeddings (bi-encoder).
+  # This model is good at creating general-purpose semantic vectors.
+  # Example: "intfloat/e5-base-v2", "sentence-transformers/all-MiniLM-L6-v2"
+  embedding: "intfloat/e5-base-v2"
+  # Model for reranking search results (cross-encoder).
+  # This model is more accurate for relevance scoring but slower.
+  # Example: "cross-encoder/ms-marco-MiniLM-L-6-v2"
+  cross_encoder: "cross-encoder/ms-marco-MiniLM-L-6-v2"
+
+# --------------------------------------------------------------------------
+# 4. VECTOR STORE (FAISS INDEX)
+# --------------------------------------------------------------------------
+# Configuration for the FAISS vector database.
+faiss:
+  # Path to save the final FAISS index.
+  index_path: "indexes/aau_faiss.index"
+  # When building the index, this is the name of the embeddings file to use.
+  embeddings_file: "embeddings.npy"
+  # This is the metadata file that maps vectors back to their source documents.
+  metadata_file: "metadata.npy"
+
+# --------------------------------------------------------------------------
+# 5. RAG PIPELINE
+# --------------------------------------------------------------------------
+# Settings for the final retrieval and generation pipeline.
+rag:
+  # Number of initial candidates to retrieve from FAISS.
+  # This should be larger than `top_k` to give the reranker options.
+  retrieval_candidates: 20
+  # Final number of top documents to use as context for the LLM.
+  top_k: 3
+  # Maximum characters to use for the context.
+  # This prevents exceeding the LLM's context window.
+  max_context_chars: 4000
+
+# --------------------------------------------------------------------------
+# 6. LM STUDIO API
+# --------------------------------------------------------------------------
+# Local LLM server configuration.
+lm_studio:
+  # URL for the LM Studio chat completions endpoint.
+  url: "http://192.168.1.8:1234/v1/chat/completions"
+  # The model identifier to use (e.g., "mistral", "llama3").
+  model: "mistralai/mistral-7b-instruct-v0.3"
+  # The temperature setting for the LLM (0.0 for deterministic output).
+  temperature: 0.0
+
+# --------------------------------------------------------------------------
+# 7. API SERVER (FastAPI)
+# --------------------------------------------------------------------------
+# Configuration for the FastAPI server that exposes the RAG pipeline.
+server:
+  host: "0.0.0.0"
+  port: 8000

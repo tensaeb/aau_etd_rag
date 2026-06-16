@@ -1,0 +1,13 @@
+faiss-cpu
+numpy
+sentence-transformers
+requests
+nltk
+langchain
+rank-bm25
+torch
+fastapi
+uvicorn
+pyyaml
+unstructured[local-inference]
+pikepdf

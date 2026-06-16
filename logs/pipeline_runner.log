@@ -1,0 +1,70 @@
+2026-05-07 18:27:15 - pipeline_runner - INFO - ======================================================================
+2026-05-07 18:27:15 - pipeline_runner - INFO - AAU ETD RAG PIPELINE RUNNER
+2026-05-07 18:27:15 - pipeline_runner - INFO - ======================================================================
+2026-05-07 18:27:15 - pipeline_runner - INFO - --- STARTING STEP: src.pipeline.extract_text ---
+2026-05-07 18:27:15 - pipeline_runner - ERROR - Error in step src.pipeline.extract_text:
+2026-05-07 19:13:37 - pipeline_runner - INFO - ======================================================================
+2026-05-07 19:13:37 - pipeline_runner - INFO - AAU ETD RAG PIPELINE RUNNER
+2026-05-07 19:13:37 - pipeline_runner - INFO - ======================================================================
+2026-05-07 19:13:37 - pipeline_runner - INFO - --- STARTING STEP: src.pipeline.extract_text ---
+2026-05-07 19:13:38 - pipeline_runner - ERROR - Error in step src.pipeline.extract_text:
+2026-05-07 19:14:51 - pipeline_runner - INFO - ======================================================================
+2026-05-07 19:14:51 - pipeline_runner - INFO - AAU ETD RAG PIPELINE RUNNER
+2026-05-07 19:14:51 - pipeline_runner - INFO - ======================================================================
+2026-05-07 19:14:51 - pipeline_runner - INFO - --- STARTING STEP: src.pipeline.extract_text ---
+2026-05-07 19:14:51 - pipeline_runner - ERROR - Error in step src.pipeline.extract_text:
+2026-05-07 20:10:39 - pipeline_runner - INFO - ======================================================================
+2026-05-07 20:10:39 - pipeline_runner - INFO - AAU ETD RAG PIPELINE RUNNER
+2026-05-07 20:10:39 - pipeline_runner - INFO - ======================================================================
+2026-05-07 20:10:39 - pipeline_runner - INFO - --- STARTING STEP: src.pipeline.extract_text ---
+2026-05-07 20:11:55 - pipeline_runner - INFO - --- COMPLETED STEP: src.pipeline.extract_text in 75.95s ---
+2026-05-07 20:11:55 - pipeline_runner - INFO - --- STARTING STEP: src.pipeline.chunk_text ---
+2026-05-07 20:11:55 - pipeline_runner - ERROR - Error in step src.pipeline.chunk_text:
+2026-05-07 20:56:55 - pipeline_runner - INFO - ======================================================================
+2026-05-07 20:56:56 - pipeline_runner - INFO - AAU ETD RAG PIPELINE RUNNER
+2026-05-07 20:56:56 - pipeline_runner - INFO - ======================================================================
+2026-05-07 20:56:56 - pipeline_runner - INFO - --- STARTING STEP: src.pipeline.extract_text ---
+2026-05-07 20:57:09 - pipeline_runner - INFO - --- COMPLETED STEP: src.pipeline.extract_text in 13.83s ---
+2026-05-07 20:57:09 - pipeline_runner - INFO - --- STARTING STEP: src.pipeline.chunk_text ---
+2026-05-07 20:57:27 - pipeline_runner - INFO - --- COMPLETED STEP: src.pipeline.chunk_text in 17.94s ---
+2026-05-07 20:57:27 - pipeline_runner - INFO - --- STARTING STEP: src.pipeline.build_bm25 ---
+2026-05-07 20:57:28 - pipeline_runner - INFO - --- COMPLETED STEP: src.pipeline.build_bm25 in 0.40s ---
+2026-05-07 20:57:28 - pipeline_runner - INFO - --- STARTING STEP: src.pipeline.embed_chunks ---
+2026-05-07 21:00:24 - pipeline_runner - INFO - ======================================================================
+2026-05-07 21:00:24 - pipeline_runner - INFO - AAU ETD RAG PIPELINE RUNNER
+2026-05-07 21:00:24 - pipeline_runner - INFO - ======================================================================
+2026-05-07 21:00:24 - pipeline_runner - INFO - --- STARTING STEP: src.pipeline.extract_text ---
+2026-05-07 21:00:52 - pipeline_runner - INFO - --- COMPLETED STEP: src.pipeline.extract_text in 27.67s ---
+2026-05-07 21:00:52 - pipeline_runner - INFO - --- STARTING STEP: src.pipeline.chunk_text ---
+2026-05-07 21:01:20 - pipeline_runner - INFO - --- COMPLETED STEP: src.pipeline.chunk_text in 27.37s ---
+2026-05-07 21:01:20 - pipeline_runner - INFO - --- STARTING STEP: src.pipeline.build_bm25 ---
+2026-05-07 21:01:21 - pipeline_runner - INFO - --- COMPLETED STEP: src.pipeline.build_bm25 in 1.21s ---
+2026-05-07 21:01:21 - pipeline_runner - INFO - --- STARTING STEP: src.pipeline.embed_chunks ---
+2026-05-07 21:03:10 - pipeline_runner - INFO - --- COMPLETED STEP: src.pipeline.embed_chunks in 342.10s ---
+2026-05-07 21:03:10 - pipeline_runner - INFO - --- STARTING STEP: src.pipeline.build_faiss ---
+2026-05-07 21:03:16 - pipeline_runner - INFO - --- COMPLETED STEP: src.pipeline.build_faiss in 6.31s ---
+2026-05-07 21:03:16 - pipeline_runner - INFO - ======================================================================
+2026-05-07 21:03:16 - pipeline_runner - INFO - PIPELINE COMPLETED SUCCESSFULLY
+2026-05-07 21:03:16 - pipeline_runner - INFO - ======================================================================
+2026-05-07 21:06:41 - pipeline_runner - INFO - --- COMPLETED STEP: src.pipeline.embed_chunks in 320.42s ---
+2026-05-07 21:06:41 - pipeline_runner - INFO - --- STARTING STEP: src.pipeline.build_faiss ---
+2026-05-07 21:06:42 - pipeline_runner - INFO - --- COMPLETED STEP: src.pipeline.build_faiss in 0.48s ---
+2026-05-07 21:06:42 - pipeline_runner - INFO - ======================================================================
+2026-05-07 21:06:42 - pipeline_runner - INFO - PIPELINE COMPLETED SUCCESSFULLY
+2026-05-07 21:06:42 - pipeline_runner - INFO - ======================================================================
+2026-05-07 21:20:24 - pipeline_runner - INFO - ======================================================================
+2026-05-07 21:20:24 - pipeline_runner - INFO - AAU ETD RAG PIPELINE RUNNER
+2026-05-07 21:20:24 - pipeline_runner - INFO - ======================================================================
+2026-05-07 21:20:24 - pipeline_runner - INFO - --- STARTING STEP: src.pipeline.extract_text ---
+2026-05-07 21:20:38 - pipeline_runner - INFO - --- COMPLETED STEP: src.pipeline.extract_text in 13.87s ---
+2026-05-07 21:20:38 - pipeline_runner - INFO - --- STARTING STEP: src.pipeline.chunk_text ---
+2026-05-07 21:20:50 - pipeline_runner - INFO - --- COMPLETED STEP: src.pipeline.chunk_text in 12.33s ---
+2026-05-07 21:20:50 - pipeline_runner - INFO - --- STARTING STEP: src.pipeline.build_bm25 ---
+2026-05-07 21:20:51 - pipeline_runner - INFO - --- COMPLETED STEP: src.pipeline.build_bm25 in 0.43s ---
+2026-05-07 21:20:51 - pipeline_runner - INFO - --- STARTING STEP: src.pipeline.embed_chunks ---
+2026-05-07 21:25:22 - pipeline_runner - INFO - --- COMPLETED STEP: src.pipeline.embed_chunks in 271.07s ---
+2026-05-07 21:25:22 - pipeline_runner - INFO - --- STARTING STEP: src.pipeline.build_faiss ---
+2026-05-07 21:25:22 - pipeline_runner - INFO - --- COMPLETED STEP: src.pipeline.build_faiss in 0.69s ---
+2026-05-07 21:25:22 - pipeline_runner - INFO - ======================================================================
+2026-05-07 21:25:22 - pipeline_runner - INFO - PIPELINE COMPLETED SUCCESSFULLY
+2026-05-07 21:25:22 - pipeline_runner - INFO - ======================================================================

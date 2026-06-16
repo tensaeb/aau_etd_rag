@@ -1,0 +1,10 @@
+2026-05-07 20:57:28 - bm25_retriever - INFO - Building BM25 index for 546 documents
+2026-05-07 20:57:28 - bm25_retriever - INFO - Saved BM25 index to C:\Users\befek\OneDrive\Documents\RAG\aau-etd\indexes\bm25_index.pkl
+2026-05-07 21:01:20 - bm25_retriever - INFO - Building BM25 index for 546 documents
+2026-05-07 21:01:20 - bm25_retriever - INFO - Saved BM25 index to C:\Users\befek\OneDrive\Documents\RAG\aau-etd\indexes\bm25_index.pkl
+2026-05-07 21:09:22 - bm25_retriever - INFO - Loading BM25 index from C:\Users\befek\OneDrive\Documents\RAG\aau-etd\indexes\bm25_index.pkl
+2026-05-07 21:20:51 - bm25_retriever - INFO - Building BM25 index for 546 documents
+2026-05-07 21:20:51 - bm25_retriever - INFO - Saved BM25 index to C:\Users\befek\OneDrive\Documents\RAG\aau-etd\indexes\bm25_index.pkl
+2026-05-07 21:26:04 - bm25_retriever - INFO - Loading BM25 index from C:\Users\befek\OneDrive\Documents\RAG\aau-etd\indexes\bm25_index.pkl
+2026-05-07 21:33:28 - bm25_retriever - INFO - Loading BM25 index from C:\Users\befek\OneDrive\Documents\RAG\aau-etd\indexes\bm25_index.pkl
+2026-05-07 21:41:00 - bm25_retriever - INFO - Loading BM25 index from C:\Users\befek\OneDrive\Documents\RAG\aau-etd\indexes\bm25_index.pkl
